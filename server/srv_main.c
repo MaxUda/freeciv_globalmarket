@@ -115,6 +115,7 @@
 #include "unithand.h"
 #include "unittools.h"
 #include "voting.h"
+#include "trade.h"
 
 /* server/advisors */
 #include "advdata.h"
@@ -1452,6 +1453,36 @@ static void end_phase(void)
   } phase_players_iterate_end;
 }
 
+static void double_iterate(const struct player *pplayer1){
+    players_iterate(pplayer){
+      if(pplayer != pplayer1){
+        if(players_can_trade(pplayer1, pplayer)){
+          char *pp_name = player_name(pplayer);
+          printf("%s\n", pp_name);
+        }
+      }
+    }players_iterate_end;
+}
+
+static void can_traid_with(void){
+    players_iterate(pplayer) {
+      char *pp_name =  player_name(pplayer);
+      printf("%s can traid with: \n", pp_name);
+      double_iterate(pplayer);
+    
+    /*city_list_iterate(pplayer->cities, pcity) {
+      shields += pcity->prod[O_SHIELD];
+      food += pcity->prod[O_FOOD];
+    } city_list_iterate_end;
+    
+    	//printf("food: %d\nshields: %d\n=============", food, shields);
+    	food = 0;
+    	shields = 0;*/
+
+    	
+    } players_iterate_end;
+}
+
 /**********************************************************************//**
   Handle the end of each turn.
 **************************************************************************/
@@ -1463,6 +1494,10 @@ static void end_turn(void)
 
   /* Hack: because observer players never get an end-phase packet we send
    * one here. */
+  can_traid_with();
+  //test1();
+
+
   conn_list_iterate(game.est_connections, pconn) {
     if (NULL == pconn->playing) {
       send_packet_end_phase(pconn);
