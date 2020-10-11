@@ -1453,7 +1453,7 @@ static void end_phase(void)
   } phase_players_iterate_end;
 }
 
-static void double_iterate(const struct player *pplayer1){
+/*static void double_iterate(const struct player *pplayer1){
     players_iterate(pplayer){
       if(pplayer != pplayer1){
         if(players_can_trade(pplayer1, pplayer)){
@@ -1470,19 +1470,37 @@ static void can_traid_with(void){
       printf("%s can traid with: \n", pp_name);
       double_iterate(pplayer);
     
-    /*city_list_iterate(pplayer->cities, pcity) {
+    city_list_iterate(pplayer->cities, pcity) {
       shields += pcity->prod[O_SHIELD];
       food += pcity->prod[O_FOOD];
     } city_list_iterate_end;
     
     	//printf("food: %d\nshields: %d\n=============", food, shields);
     	food = 0;
-    	shields = 0;*/
+    	shields = 0;
 
     	
     } players_iterate_end;
+}*/
+
+static void test_distr(){
+  players_iterate(pplayer) {
+    if (is_ai(pplayer) || is_barbarian(pplayer)) {
+      continue;
+    }
+    distribute_resource(pplayer, 1, 5, 1);
+  } players_iterate_end;
 }
 
+static void test_take(){
+  players_iterate(pplayer) {
+    if (is_ai(pplayer) || is_barbarian(pplayer)) {
+      continue;
+    }
+    if (count_player_cities(pplayer) >= 2)
+      take_resource(pplayer, 1, 10, 1);
+  } players_iterate_end;
+}
 /**********************************************************************//**
   Handle the end of each turn.
 **************************************************************************/
@@ -1494,9 +1512,7 @@ static void end_turn(void)
 
   /* Hack: because observer players never get an end-phase packet we send
    * one here. */
-  can_traid_with();
-  //test1();
-
+  //can_traid_with();
 
   conn_list_iterate(game.est_connections, pconn) {
     if (NULL == pconn->playing) {
@@ -1678,6 +1694,9 @@ static void end_turn(void)
   settings_turn();
   stdinhand_turn();
   voting_turn();
+  test_output();
+  test_distr();
+  test_take();
   send_city_turn_notifications(NULL);
 
   log_debug("Gamenextyear");
