@@ -7,5 +7,6 @@ void test_output();
 void distribute_resource(const struct player *pplayer, int resource_type, int resource_amount, int distribute_mode);
 void take_resource(const struct player *pplayer, int resource_type, int resource_amount, int take_mode);
 int count_player_cities(const struct player *pplayer);
+void update_price(pplayer);
 
 #endif 

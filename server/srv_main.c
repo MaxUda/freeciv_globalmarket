@@ -1067,6 +1067,14 @@ static void ai_start_phase(void)
   kill_dying_players();
 }
 
+
+void test_price_calc(){
+  players_iterate(pplayer) {
+    update_price(pplayer);
+    printf("food buy: %d\nFood sell: %d\n", pplayer->price_food_buy, pplayer->price_food_sell);
+  } players_iterate_end;
+}
+
 /**********************************************************************//**
   Handle the beginning of each turn.
   Note: This does not give "time" to any player;
@@ -1169,6 +1177,7 @@ static void begin_turn(bool is_new_turn)
   }
 
   sanity_check();
+  test_price_calc();
 }
 
 /**********************************************************************//**
@@ -1694,9 +1703,9 @@ static void end_turn(void)
   settings_turn();
   stdinhand_turn();
   voting_turn();
-  test_output();
-  test_distr();
-  test_take();
+  //test_output();
+  //test_distr();
+  //test_take();
   send_city_turn_notifications(NULL);
 
   log_debug("Gamenextyear");

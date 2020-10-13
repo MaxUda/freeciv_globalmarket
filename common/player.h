@@ -262,6 +262,13 @@ struct player {
 
   int primary_capital_id;
 
+  //trading
+  int price_food_buy;
+  int price_food_sell;
+  int delta_food;
+
+
+
   bv_player real_embassy;
   const struct player_diplstate **diplstates;
   struct nation_style *style;

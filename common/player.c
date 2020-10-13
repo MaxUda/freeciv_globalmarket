@@ -557,6 +557,10 @@ static void player_defaults(struct player *pplayer)
   pplayer->cities = city_list_new();
   pplayer->units = unit_list_new();
 
+  pplayer->price_food_buy = 0;
+  pplayer->price_food_sell = 0;
+  pplayer->delta_food = 0;
+
   pplayer->economic.gold    = 0;
   pplayer->economic.tax     = PLAYER_DEFAULT_TAX_RATE;
   pplayer->economic.science = PLAYER_DEFAULT_SCIENCE_RATE;

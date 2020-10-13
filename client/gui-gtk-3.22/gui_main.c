@@ -1933,9 +1933,10 @@ void ui_main(int argc, char **argv)
 
   /* assumes client_state is set */
   timer_id = g_timeout_add(TIMER_INTERVAL, timer_callback, NULL);
-
+  printf("t\n");
   gui_up = TRUE;
-  gtk_main();
+  gtk_main();//--------------------------
+  printf("t\n");
   gui_up = FALSE;
 
   destroy_server_scans();

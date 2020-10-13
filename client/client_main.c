@@ -998,7 +998,6 @@ void set_client_state(enum client_states newstate)
   if (can_client_change_view()) {
     update_map_canvas_visible();
   }
-
   /* If turn was going to change, that is now aborted. */
   set_server_busy(FALSE);
 }
