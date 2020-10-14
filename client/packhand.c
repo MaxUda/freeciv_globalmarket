@@ -2238,6 +2238,7 @@ void handle_player_remove(int playerno)
 ****************************************************************************/
 void handle_player_info(const struct packet_player_info *pinfo)
 {
+  printf("/");
   bool is_new_nation = FALSE;
   bool turn_done_changed = FALSE;
   bool new_player = FALSE;
@@ -2312,6 +2313,14 @@ void handle_player_info(const struct packet_player_info *pinfo)
   pplayer->client.tech_upkeep = pinfo->tech_upkeep;
   pplayer->government = pgov;
   pplayer->target_government = ptarget_gov;
+
+  pplayer->price_food_buy = pinfo->price_food_buy;
+  pplayer->price_food_sell = pinfo->price_food_sell;
+  pplayer->delta_food = pinfo->delta_food;
+
+
+
+
   /* Don't use player_iterate here, because we ignore the real number
    * of players and we want to read all the datas. */
   BV_CLR_ALL(pplayer->real_embassy);

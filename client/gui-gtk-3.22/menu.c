@@ -16,6 +16,8 @@
 #endif
 
 #include <stdlib.h>
+#include <stdio.h>
+
 
 #include <gtk/gtk.h>
 
@@ -198,6 +200,7 @@ static void save_scenario_callback(GtkMenuItem *item, gpointer data);
 static void center_view_callback(GtkMenuItem *item, gpointer data);
 static void report_economy_callback(GtkMenuItem *item, gpointer data);
 static void report_research_callback(GtkMenuItem *item, gpointer data);
+static void report_globalmarket_callback(GtkMenuItem *action, gpointer data);
 static void multiplier_callback(GtkMenuItem *item, gpointer data);
 static void report_spaceship_callback(GtkMenuItem *item, gpointer data);
 static void report_achievements_callback(GtkMenuItem *item, gpointer data);
@@ -293,7 +296,7 @@ static struct menu_entry_info menu_entries[] =
     G_CALLBACK(client_lua_script_callback), MGROUP_SAFE },
   { "MAP_VIEW", N_("?noun:_View"), GDK_KEY_F1, 0,
     G_CALLBACK(map_view_callback), MGROUP_SAFE },
-  { "REPORT_UNITS", N_("_Units"), GDK_KEY_F2, 0,
+  { "REPORT_UNITS", N_("_Units"), GDK_KEY_F2, 0,//------------------
     G_CALLBACK(report_units_callback), MGROUP_SAFE },
   { "REPORT_NATIONS", N_("_Nations"), GDK_KEY_F3, 0,
     G_CALLBACK(report_nations_callback), MGROUP_SAFE },
@@ -433,6 +436,8 @@ static struct menu_entry_info menu_entries[] =
     G_CALLBACK(report_economy_callback), MGROUP_PLAYER },
   { "REPORT_RESEARCH", N_("_Research"), GDK_KEY_F6, 0,
     G_CALLBACK(report_research_callback), MGROUP_PLAYER },
+  { "REPORT_GLOBALMARKET", N_("_Global market"), GDK_KEY_F7, 0,
+    G_CALLBACK(report_globalmarket_callback), MGROUP_PLAYER },  
   { "POLICIES", N_("_Policies..."),
     GDK_KEY_p, GDK_SHIFT_MASK | GDK_CONTROL_MASK,
     G_CALLBACK(multiplier_callback), MGROUP_PLAYER },
@@ -1860,6 +1865,14 @@ static void report_economy_callback(GtkMenuItem *action, gpointer data)
 static void report_research_callback(GtkMenuItem *action, gpointer data)
 {
   science_report_dialog_popup(TRUE);
+}
+
+/************************************************************************//**
+  Action "REPORT_GLOBALMARKET" callback.
+****************************************************************************/
+static void report_globalmarket_callback(GtkMenuItem *action, gpointer data)
+{
+  globalmarket_report_dialog_popup();
 }
 
 /************************************************************************//**

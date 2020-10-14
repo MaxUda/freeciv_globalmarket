@@ -1070,9 +1070,13 @@ static void ai_start_phase(void)
 
 void test_price_calc(){
   players_iterate(pplayer) {
+    if (is_ai(pplayer) || is_barbarian(pplayer)) {
+      continue;
+    }
     update_price(pplayer);
-    printf("food buy: %d\nFood sell: %d\n", pplayer->price_food_buy, pplayer->price_food_sell);
+    printf("food buy: %d\nfood sell: %d\n", pplayer->price_food_buy, pplayer->price_food_sell);
   } players_iterate_end;
+  printf("===============================\n");
 }
 
 /**********************************************************************//**
@@ -1177,7 +1181,6 @@ static void begin_turn(bool is_new_turn)
   }
 
   sanity_check();
-  test_price_calc();
 }
 
 /**********************************************************************//**
@@ -1515,6 +1518,7 @@ static void test_take(){
 **************************************************************************/
 static void end_turn(void)
 {
+  test_price_calc();
   int food = 0, shields = 0, trade = 0, settlers = 0;
 
   log_debug("Endturn");
@@ -1538,6 +1542,10 @@ static void end_turn(void)
     if (!is_ai(pplayer) || is_barbarian(pplayer)) {
       continue;
     }
+    //distribute_resource(pplayer, 1, 10, 1);
+    //city_list_iterate(pplayer->cities, pcity){
+    //  printf("Food: %d\n", pcity->food_stock);
+    //}city_list_iterate_end;
     unit_list_iterate(pplayer->units, punit) {
       if (unit_is_cityfounder(punit)) {
         settlers++;

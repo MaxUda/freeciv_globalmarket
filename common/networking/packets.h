@@ -112,7 +112,7 @@ void remove_packet_from_buffer(struct socket_packet_buffer *buffer);
 
 void send_attribute_block(const struct player *pplayer,
 			  struct connection *pconn);
-void generic_handle_player_attribute_chunk(struct player *pplayer,
+void generic_handle_player_attribute_chunk(struct player *pplayer,//------------
 					   const struct
 					   packet_player_attribute_chunk
 					   *chunk);

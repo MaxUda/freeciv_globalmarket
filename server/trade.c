@@ -186,36 +186,7 @@ void distribute_food_mode_1(struct player *pplayer, int food_amount){
 //shield supply in city: pcity->shield_stock
 //shield surplus in city: pcity->surplus[O_SHIELD]
 
-int calculate_buy_price(int recourse_type){//1=food; 2=shield
-	static int k = 1;
-	int price;
-	int total_prod = 0, total_cons = 0, total_gold_earned = 0;
-	//gather ststs
-	if(recourse_type == 1){
-		players_iterate(pplayer) {
-			city_list_iterate(pplayer->cities, pcity) {
-
-			  int food_prod = pcity->prod[O_FOOD];
-			  int food_stock = pcity->food_stock;
-			  int food_surplus = pcity->surplus[O_FOOD];
-
-			  int shield_prod = pcity->prod[O_SHIELD];
-			  int shield_stock = pcity->shield_stock;
-			  int shield_surplus = pcity->surplus[O_SHIELD];
-
-			} city_list_iterate_end;
-		} players_iterate_end;
-	}else if(recourse_type == 2){
-
-		//aaaaaaaaaaaaaaaaaaa
-	}
-    //calculate price with complex formula
-    price = k;
-    k++;
-	return price;
-}
-
-int calculate_sell_price(int recourse_type){
+int calculate_buy_price(struct player *pplayer, int recourse_type){//1=food; 2=shield
 	static int k = 1;
 	int price;
 	int total_prod = 0, total_cons = 0, total_gold_earned = 0;
@@ -241,17 +212,45 @@ int calculate_sell_price(int recourse_type){
     //calculate price with complex formula
     price = k;
     k++;
-	return price;
+	return pplayer->price_food_buy + 10;
+}
+
+int calculate_sell_price(struct player *pplayer, int recourse_type){
+	static int k = 1;
+	int price;
+	int total_prod = 0, total_cons = 0, total_gold_earned = 0;
+	//gather ststs
+	/*if(recourse_type == 1){
+		players_iterate(pplayer) {
+			city_list_iterate(pplayer->cities, pcity) {
+
+			  int food_prod = pcity->prod[O_FOOD];
+			  int food_stock = pcity->food_stock;
+			  int food_surplus = pcity->surplus[O_FOOD];
+
+			  int shield_prod = pcity->prod[O_SHIELD];
+			  int shield_stock = pcity->shield_stock;
+			  int shield_surplus = pcity->surplus[O_SHIELD];
+
+			} city_list_iterate_end;
+		} players_iterate_end;
+	}else if(recourse_type == 2){
+
+		//aaaaaaaaaaaaaaaaaaa
+	}*/
+    //calculate price with complex formula
+    price = k;
+    k++;
+	return pplayer->price_food_sell + 10;
 }
 
 void update_price(struct player *pplayer){
 	
-	int buy_price = calculate_buy_price(1); 
+	int buy_price = calculate_buy_price(pplayer, 1); 
 		
 	pplayer->price_food_buy = buy_price;
 		printf("----\n");
-
-	int sell_price = calculate_sell_price(1); 
+	int sell_price = calculate_sell_price(pplayer, 1); 
 		printf("----\n");
 	pplayer->price_food_sell = sell_price;
 		printf("!!!\n");

@@ -1309,6 +1309,10 @@ static void package_player_info(struct player *plr,
     packet->infrapoints     = 0;
   }
 
+  packet->price_food_buy = plr->price_food_buy;
+  packet->price_food_sell = plr->price_food_sell;
+  packet->delta_food = plr->delta_food;
+
 #ifdef FREECIV_WEB
   if (info_level >= INFO_FULL) {
     web_packet->expected_income = player_get_expected_income(plr);

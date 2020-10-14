@@ -915,6 +915,10 @@ PACKET_PLAYER_INFO = 51; sc, is-info
   UINT16 tech_upkeep;
   UINT16 science_cost;
 
+  SINT32 price_food_buy;
+  SINT32 price_food_sell;
+  SINT32 delta_food;
+
   BOOL is_connected;
   TURN revolution_finishes;
   UINT8 ai_skill_level;

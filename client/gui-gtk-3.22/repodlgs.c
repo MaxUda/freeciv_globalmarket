@@ -727,6 +727,31 @@ void science_report_dialog_redraw(void)
   }
 }
 
+/************************************************************************//**
+                      GLOBALMARKET REPORT DIALOG  
+****************************************************************************/
+
+
+
+
+/************************************************************************//**
+  globalmarket_report_dialog_popup  
+****************************************************************************/
+void globalmarket_report_dialog_popup(){
+  printf("aaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+  players_iterate(pplayer) {
+    if (client_has_player() && pplayer != client_player()) {
+      continue;
+    }
+    city_list_iterate(pplayer->cities, pcity){
+      printf("Food: %d\n", pcity->food_stock);
+    }city_list_iterate_end;
+    printf("Food_price_buy: %d\n", pplayer->price_food_buy);
+    printf("Food_price_sell: %d\n", pplayer->price_food_sell);
+  } players_iterate_end;
+}
+
+
 
 /****************************************************************************
                       ECONOMY REPORT DIALOG
