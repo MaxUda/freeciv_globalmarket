@@ -2964,7 +2964,7 @@ void handle_player_attribute_block(struct player *pplayer)
   (Hmm, how should "turn done" work for multi-connected non-observer players?)
 **************************************************************************/
 void handle_player_phase_done(struct player *pplayer,
-                              int turn)
+                              int turn, int delta_food)
 {
   if (turn != game.info.turn) {
     /* If this happens then the player actually pressed turn-done on a
@@ -2973,6 +2973,7 @@ void handle_player_phase_done(struct player *pplayer,
     return;
   }
   pplayer->phase_done = TRUE;
+  pplayer->delta_food = delta_food;
 
   check_for_full_turn_done();
 

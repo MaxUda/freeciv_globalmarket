@@ -748,6 +748,11 @@ void globalmarket_report_dialog_popup(){
     }city_list_iterate_end;
     printf("Food_price_buy: %d\n", pplayer->price_food_buy);
     printf("Food_price_sell: %d\n", pplayer->price_food_sell);
+    int k;
+    printf("Food amount player: ");
+    scanf("%d", &k);
+    printf("\n");
+    pplayer->delta_food = k;
   } players_iterate_end;
 }
 

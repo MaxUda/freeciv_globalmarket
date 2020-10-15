@@ -1074,7 +1074,7 @@ void test_price_calc(){
       continue;
     }
     update_price(pplayer);
-    printf("food buy: %d\nfood sell: %d\n", pplayer->price_food_buy, pplayer->price_food_sell);
+    printf("food buy: %d\nfood sell: %d\nfood player sell %d\n", pplayer->price_food_buy, pplayer->price_food_sell, pplayer->delta_food);
   } players_iterate_end;
   printf("===============================\n");
 }

@@ -806,8 +806,15 @@ void send_turn_done(void)
   waiting_for_end_turn = FALSE;
 
   attribute_flush();
+  int delta_food;
+  players_iterate(pplayer){
+  	if (client_has_player() && pplayer != client_player()) {
+      continue;
+    }
+    delta_food = pplayer->delta_food;
+  }players_iterate_end;
 
-  dsend_packet_player_phase_done(&client.conn, game.info.turn);
+  dsend_packet_player_phase_done(&client.conn, game.info.turn, delta_food);
 
   update_turn_done_button_state();
 }

@@ -945,6 +945,7 @@ end
 
 PACKET_PLAYER_PHASE_DONE = 52; cs, dsend
   TURN turn;
+  UINT16 delta_food;
 end
 
 PACKET_PLAYER_RATES = 53; cs, dsend
