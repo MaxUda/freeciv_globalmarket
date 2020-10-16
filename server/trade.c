@@ -16,6 +16,7 @@
 /*common*/
 #include"player.h"
 #include"city.h"
+#include"trade.h"
 
 void test1(){
 	printf("New turn ------------------------------------------\n");
@@ -257,3 +258,77 @@ void update_price(struct player *pplayer){
 
 }
 
+void make_ai_trade()
+{
+	players_iterate(pplayer) {
+		if (!is_ai(pplayer) || is_barbarian(pplayer)) {
+      		continue;
+    	}
+    	//ai_player_trade(pplayer);
+    } players_iterate_end;
+}
+
+/*void ai_player_trade(struct player *pplayer)
+{
+	
+}*/
+
+
+/*********************************************************
+						ECO CONTROL
+**********************************************************/
+
+int count_player_resource_chars(struct player *pplayer, int resource_type)
+{
+	int total_surplus = 0;
+	city_list_iterate(pplayer->cities, pcity){
+		switch(resource_type){
+			case 1:
+				total_surplus += pcity->surplus[O_FOOD];
+				break;
+			default:
+				break;
+		}
+	}city_list_iterate_end;
+	return total_surplus;
+} 
+
+/*struct player_resource_chars{
+	int resource_type;
+	int surplus_cities_count;
+	int shoretage_cities_count;
+	int neutral_city_count;
+	int total_resource_delta;
+};*/
+
+void make_player_eco_report(struct player* pplayer, struct player_resource_chars *pl_rc_ch, int resource_type)
+{
+
+	    printf("/\n");
+	pl_rc_ch->surplus_cities_count = 0;
+	pl_rc_ch->total_resource_delta = 0;
+	pl_rc_ch->shoretage_cities_count = 0;
+	pl_rc_ch->neutral_city_count = 0;
+		printf("/\n");
+	city_list_iterate(pplayer->cities, pcity){
+		if(pcity->surplus[O_FOOD] > 0){
+			pl_rc_ch->surplus_cities_count++;
+			pl_rc_ch->total_resource_delta += pcity->surplus[O_FOOD];
+		}else if(pcity->surplus[O_FOOD] < 0){
+			pl_rc_ch->shoretage_cities_count++;
+			pl_rc_ch->total_resource_delta += pcity->surplus[O_FOOD];
+		}else{
+			pl_rc_ch->neutral_city_count++;
+		}
+	}city_list_iterate_end;
+
+	pl_rc_ch->resource_type = resource_type;
+}
+
+void print_player_resource_chars(struct player_resource_chars *pl_rc_ch)
+{
+	printf("Total food delta: %d\n", pl_rc_ch->total_resource_delta);
+	printf("Surplus cities count: %d\n", pl_rc_ch->surplus_cities_count);
+	printf("shoretage_cities_count: %d\n", pl_rc_ch->shoretage_cities_count);
+	printf("Neutral city count: %d\n", pl_rc_ch->neutral_city_count);
+}

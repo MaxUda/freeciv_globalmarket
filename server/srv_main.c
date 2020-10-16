@@ -1513,12 +1513,40 @@ static void test_take(){
       take_resource(pplayer, 1, 10, 1);
   } players_iterate_end;
 }
+
+void test_change_food(){
+  players_iterate(pplayer) {
+    if (is_ai(pplayer) || is_barbarian(pplayer)) {
+      continue;
+    }
+    
+    city_list_iterate(pplayer->cities, pcity) {
+      if(pcity)
+      
+      printf("Food_surplus: %d\n", pcity->surplus[O_FOOD]);
+    } city_list_iterate_end;
+  } players_iterate_end;
+}
+
+
+void test_chars(){
+  players_iterate(pplayer) {
+    struct player_resource_chars *pl_rs_ch;
+    struct player_resource_chars pl;
+    pl_rs_ch = &pl;
+    printf("/\n");
+    make_player_eco_report(pplayer, pl_rs_ch, 1);
+    printf("/\n");
+    print_player_resource_chars(pl_rs_ch);
+    printf("/\n");
+  } players_iterate_end;
+}
 /**********************************************************************//**
   Handle the end of each turn.
 **************************************************************************/
 static void end_turn(void)
 {
-  test_price_calc();
+  //test_price_calc();
   int food = 0, shields = 0, trade = 0, settlers = 0;
 
   log_debug("Endturn");
@@ -1526,7 +1554,8 @@ static void end_turn(void)
   /* Hack: because observer players never get an end-phase packet we send
    * one here. */
   //can_traid_with();
-
+  test_change_food();
+  test_chars();
   conn_list_iterate(game.est_connections, pconn) {
     if (NULL == pconn->playing) {
       send_packet_end_phase(pconn);
