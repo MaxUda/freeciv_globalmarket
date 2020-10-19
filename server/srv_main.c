@@ -141,6 +141,8 @@
 
 #include "srv_main.h"
 
+FILE *fp;
+
 static void end_turn(void);
 static void announce_player(struct player *pplayer);
 static void fc_interface_init_server(void);
@@ -1073,7 +1075,7 @@ void test_price_calc(){
     if (is_ai(pplayer) || is_barbarian(pplayer)) {
       continue;
     }
-    update_price(pplayer);
+    //update_price(pplayer);
     printf("food buy: %d\nfood sell: %d\nfood player sell %d\n", pplayer->price_food_buy, pplayer->price_food_sell, pplayer->delta_food);
   } players_iterate_end;
   printf("===============================\n");
@@ -1541,6 +1543,40 @@ void test_chars(){
     printf("/\n");
   } players_iterate_end;
 }
+
+
+
+void test_price_making(){
+ 
+  fp = fopen("output.txt", "a+");
+  int i = 0;
+  static float k_prev = 0;
+  static int stock = 110;
+  float k = (float)count_total_usage()/((float)count_total_production() + stock);
+  //float k = (float)count_total_production()/(float)count_total_usage();
+
+  float s = k_prev - k;
+  //printf("DELTA %f\n", s);
+  players_iterate(pplayer) {
+    printf("pl_delta: %d\n", pplayer->delta_food);
+    update_price(pplayer, s, stock);
+    //stock += 15*pplayer->delta_food;
+   //stock+= 10;
+    printf("||||||||||||||||||||||||||||||%d\n", pplayer->delta_food);
+    //if (pplayer->name == "Cesar") {
+    if (i == 0){
+      printf("Total prod: %d\nTotal use: %d\nPreice: %d\n", count_total_production(), count_total_usage(), pplayer->price_food_buy);
+      fprintf(fp, "%d %d %d %d\n", count_total_production(), count_total_usage(), pplayer->price_food_buy, stock);
+      i++;
+    }
+       //}
+  } players_iterate_end;
+  fclose(fp);
+  printf("==========================\n");
+  commit_bargains(1);
+  make_ai_trade(stock);
+  k_prev = k;
+}
 /**********************************************************************//**
   Handle the end of each turn.
 **************************************************************************/
@@ -1554,8 +1590,9 @@ static void end_turn(void)
   /* Hack: because observer players never get an end-phase packet we send
    * one here. */
   //can_traid_with();
-  test_change_food();
-  test_chars();
+  //test_change_food();
+  //test_chars();
+  test_price_making();
   conn_list_iterate(game.est_connections, pconn) {
     if (NULL == pconn->playing) {
       send_packet_end_phase(pconn);
@@ -3506,6 +3543,7 @@ void srv_main(void)
       srv_ready(); /* srv_ready() sets server state to S_S_RUNNING. */
       srv_running();
       srv_scores();
+      //fclose(fp);
     }
 
     /* Remain in S_S_OVER until players log out */

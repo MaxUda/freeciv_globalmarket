@@ -751,8 +751,9 @@ void globalmarket_report_dialog_popup(){
     int k;
     printf("Food amount player: ");
     scanf("%d", &k);
-    printf("\n");
     pplayer->delta_food = k;
+    printf("\nFood buy cost: %d\n", pplayer->price_food_buy*k);
+    printf("Food sell profit: %d\n", pplayer->price_food_sell*k);
   } players_iterate_end;
 }
 
