@@ -1560,7 +1560,7 @@ void test_price_making(){
   players_iterate(pplayer) {
     printf("pl_delta: %d\n", pplayer->delta_food);
     update_price(pplayer, s, stock);
-    //stock += 15*pplayer->delta_food;
+    stock += pplayer->delta_food;
    //stock+= 10;
     printf("||||||||||||||||||||||||||||||%d\n", pplayer->delta_food);
     //if (pplayer->name == "Cesar") {

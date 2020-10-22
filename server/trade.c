@@ -323,26 +323,31 @@ void ai_player_trade_1(struct player *pplayer, int stock)
 	float pl_k = pl_use/pl_prod;
 	printf("%f - %f - %f - %f - %f\n", pl_use, pl_prod, pl_k, ceil(pl_prod*(pl_k - k)), k);
 	if(pl_k > k){
-		/*if(/*fabs(t_use*pl_prod - pl_use*t_prod) < fabs(t_prod*pl - pl_prod) && stock < -100){
-		printf("a %f b %f\n", fabs(t_use - pl_use), fabs(t_prod - pl_prod));
-			pplayer->delta_food = ceil(pl_prod*(pl_k - k));
-			printf("+\n");
-		}*/
+		//if(fabs(t_use*pl_prod - pl_use*t_prod) > fabs(t_prod - pl_prod)){
+		//printf("a %f b %f\n", fabs(t_use - pl_use), fabs(t_prod - pl_prod));
+		//	pplayer->delta_food = ceil(pl_prod*(pl_k - k));
+		//	printf("+\n");
+		//}
 
 		//pplayer->delta_food = ceil(pl_prod*(pl_k - k));
 		//if(pplayer->delta_food*pplayer->price_food_buy > pplayer->economic.gold)
 			//pplayer->delta_food = 0;
 		//printf("%f\n", ceil(abs(1-pl_k)*pl_prod)*3);
 	}else if (pl_k < k){
-		/*if(/*fabs(t_use - pl_use) < fabs(t_prod - pl_prod) stock > 100){
-			pplayer->delta_food = ceil(pl_prod*(pl_k - k));
-			printf("-\n");
-		}*/
+		//if(fabs(t_use - pl_use) < fabs(t_prod - pl_prod)){
+		//	pplayer->delta_food = ceil(pl_prod*(pl_k - k));
+		//	printf("-\n");
+		//}
 		//pplayer->delta_food = -ceil(pl_use*(k - pl_k));
 		//if(pplayer->delta_food > player_food_count(pplayer))
 		//	pplayer->delta_food = 0;
 		//printf("%d\n", pplayer->delta_food);
 	}
+
+	/*if(fabs(t_use - pl_use) < fabs(t_prod - pl_prod) && pl_prod > 0){
+			pplayer->delta_food = ceil((pl_prod-stock)*(pl_k - k));
+			printf("pl_k - k: %f\n");
+	}*/
 }
 
 void ai_player_trade_2(struct player *pplayer)

@@ -732,13 +732,38 @@ void science_report_dialog_redraw(void)
 ****************************************************************************/
 
 
+ void
+on_response (GtkDialog *dialog,
+             gint       response_id,
+             gpointer   user_data)
+{
+  /*For demonstration purposes, this will show the int value 
+  of the response type*/
+  GtkEntry* entry = user_data;
+  char *string = gtk_entry_get_text(entry);
+    printf("%s", string);
+  g_print ("response is %d\n", response_id);
+  /*This will cause the dialog to be destroyed*/
+  gtk_widget_destroy (GTK_WIDGET (dialog));
+}
+
+
 
 
 /************************************************************************//**
   globalmarket_report_dialog_popup  
 ****************************************************************************/
+
+static void price_changed(GtkButton *button_trade, gpointer   user_data) {
+  printf("Ptice: %s\n", gtk_entry_get_text(GTK_ENTRY(user_data)));
+  //printf("T\n");
+  GtkEntry* entry = user_data;
+  char *string = gtk_entry_get_text(GTK_ENTRY(entry));
+  //g_printf("Ptice: %s", gtk_entry_get_text(GTK_ENTRY(entry)));
+}
+static void price_changed(GtkButton *button_trade, gpointer   user_data);
 void globalmarket_report_dialog_popup(){
-  printf("aaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+  /*printf("aaaaaaaaaaaaaaaaaaaaaaaaaa\n");
   players_iterate(pplayer) {
     if (client_has_player() && pplayer != client_player()) {
       continue;
@@ -754,7 +779,101 @@ void globalmarket_report_dialog_popup(){
     pplayer->delta_food = k;
     printf("\nFood buy cost: %d\n", pplayer->price_food_buy*k);
     printf("Food sell profit: %d\n", pplayer->price_food_sell*k);
-  } players_iterate_end;
+  } players_iterate_end;*/
+  /*GtkWidget *dialog, *label, *content_area, *enter_price, *button;
+ GtkDialogFlags flags;
+
+ // Create the widgets
+ flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+ dialog = gtk_dialog_new_with_buttons ("Global Market",
+                                       NULL,
+                                       flags,
+                                       _("_OK"),
+                                       GTK_RESPONSE_OK,
+                                       _("_NONE"),
+                                       GTK_RESPONSE_NONE,
+                                       NULL);
+ content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+ label = gtk_label_new ("Current price: ");
+
+ // Ensure that the dialog box is destroyed when the user responds
+
+  g_signal_connect_swapped (dialog,
+                           "response",
+                           G_CALLBACK (gtk_widget_destroy),
+                           dialog);
+  enter_price = gtk_entry_new();
+  gtk_box_pack_start (gtk_dialog_get_content_area (dialog),
+                    enter_price,
+                    FALSE,
+                    FALSE,
+                    10);
+  button = gtk_button_new_with_label ("change");
+  gtk_box_pack_start (gtk_dialog_get_content_area (dialog),
+                    button,
+                    FALSE,
+                    FALSE,
+                    10);
+ // Add the label, and show everything we’ve added
+ 
+ 
+  //g_signal_connect(enter_price, "price changed", G_CALLBACK(price_changed), NULL);
+  g_signal_connect (GTK_DIALOG (dialog), "response", G_CALLBACK (price_changed), enter_price);
+ gtk_container_add (GTK_CONTAINER (content_area), label);
+ gtk_widget_show_all (dialog);
+ //price_changed(enter_price);
+ gtk_dialog_run(dialog);
+ //GtkEntry* entry = data;
+
+ */
+  GtkWidget *dialog;
+  GtkWidget *content_area;
+  GtkWidget *label;
+  GtkWidget *button_trade;
+   GtkWidget *enter_price;
+
+  gint response_id;
+
+  /*Create the dialog window. Modal windows prevent interaction with other 
+  windows in the same application*/
+  dialog = gtk_dialog_new_with_buttons ("A Gtk+ Dialog", 
+                                        NULL, 
+                                        GTK_DIALOG_MODAL, 
+                                        GTK_STOCK_OK, 
+                                        GTK_RESPONSE_OK, 
+                                        NULL);
+   // g_signal_connect(calculate, "clicked", G_CALLBACK(do_calculate), NULL);
+  /*Create a label and attach it to the content area of the dialog*/
+  content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
+  label = gtk_label_new ("This demonstrates a dialog with a label");
+  gtk_container_add (GTK_CONTAINER (content_area), label);
+
+  /*The main purpose of this is to show dialog's child widget, label*/
+  
+  enter_price = gtk_entry_new();
+  gtk_box_pack_start (gtk_dialog_get_content_area (dialog),
+                    enter_price,
+                    FALSE,
+                    FALSE,
+                    10);
+
+  button_trade = gtk_button_new_with_label("Confirm");
+  g_signal_connect(button_trade, "clicked", G_CALLBACK(price_changed), enter_price);
+  gtk_box_pack_start (gtk_dialog_get_content_area (dialog),
+                    button_trade,
+                    FALSE,
+                    FALSE,
+                    10);
+  
+  /*Connecting the "response" signal from the user to the associated
+  callback function*/
+
+  gtk_widget_show_all (dialog);
+
+  g_signal_connect (GTK_DIALOG (dialog), 
+                    "response", 
+                    G_CALLBACK (on_response), 
+                    enter_price);
 }
 
 

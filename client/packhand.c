@@ -2238,7 +2238,7 @@ void handle_player_remove(int playerno)
 ****************************************************************************/
 void handle_player_info(const struct packet_player_info *pinfo)
 {
-  printf("/");
+
   bool is_new_nation = FALSE;
   bool turn_done_changed = FALSE;
   bool new_player = FALSE;
