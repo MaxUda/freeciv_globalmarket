@@ -748,132 +748,212 @@ on_response (GtkDialog *dialog,
 }
 
 
+GtkWidget *delta_recourse_buy, *delta_recourse_sell, *enter_sell, *enter_buy;
 
 
 /************************************************************************//**
   globalmarket_report_dialog_popup  
 ****************************************************************************/
 
-static void price_changed(GtkButton *button_trade, gpointer   user_data) {
-  printf("Ptice: %s\n", gtk_entry_get_text(GTK_ENTRY(user_data)));
-  //printf("T\n");
-  GtkEntry* entry = user_data;
-  char *string = gtk_entry_get_text(GTK_ENTRY(entry));
-  //g_printf("Ptice: %s", gtk_entry_get_text(GTK_ENTRY(entry)));
+int count_total_production()
+{
+  int total_prod = 0;
+  players_iterate(pplayer){
+    city_list_iterate(pplayer->cities, pcity){
+      total_prod += pcity->prod[O_FOOD];
+    }city_list_iterate_end;
+  }players_iterate_end;
+  return total_prod;
 }
-static void price_changed(GtkButton *button_trade, gpointer   user_data);
-void globalmarket_report_dialog_popup(){
-  /*printf("aaaaaaaaaaaaaaaaaaaaaaaaaa\n");
+
+int count_total_usage()
+{
+  int total_use = 0;
+  players_iterate(pplayer){
+    city_list_iterate(pplayer->cities, pcity){
+      total_use += pcity->usage[O_FOOD];
+    }city_list_iterate_end;
+  }players_iterate_end;
+  return total_use;
+}
+
+int count_total_usage_player(struct player* pplayer)
+{
+  int total_use = 0;
+  
+  city_list_iterate(pplayer->cities, pcity){
+    total_use += pcity->usage[O_FOOD];
+  }city_list_iterate_end;
+  
+  return total_use;
+}
+int count_total_production_player(struct player* pplayer)
+{
+  int total_prod = 0;
+  
+  city_list_iterate(pplayer->cities, pcity){
+    total_prod += pcity->prod[O_FOOD];
+  }city_list_iterate_end;
+  
+  return total_prod;
+}
+
+int count_total_surp_player(struct player* pplayer)
+{
+  int total_surp = 0;
+  
+  city_list_iterate(pplayer->cities, pcity){
+    total_surp += pcity->surplus[O_FOOD];
+  }city_list_iterate_end;
+  
+  return total_surp;
+}
+
+int player_food_count(struct player* pplayer)
+{
+  int total_surp = 0;
+  
+  city_list_iterate(pplayer->cities, pcity){
+    total_surp += pcity->food_stock;
+  }city_list_iterate_end;
+  
+  return total_surp;
+}
+
+
+static void buy_change(GtkButton *button_trade, gpointer   user_data) {
+  GtkEntry* entry = user_data;
+  int amount = atoi((char *)gtk_entry_get_text(GTK_ENTRY(entry)));
+  char buffer[32];
+  snprintf(buffer, sizeof(buffer), "Buy amount: %d", amount);
+  gtk_label_set_text(GTK_LABEL(delta_recourse_buy), buffer);
+  snprintf(buffer, sizeof(buffer), "Sell amount: %d", 0);
+  gtk_label_set_text(GTK_LABEL(delta_recourse_sell), buffer);
   players_iterate(pplayer) {
     if (client_has_player() && pplayer != client_player()) {
       continue;
     }
-    city_list_iterate(pplayer->cities, pcity){
-      printf("Food: %d\n", pcity->food_stock);
-    }city_list_iterate_end;
-    printf("Food_price_buy: %d\n", pplayer->price_food_buy);
-    printf("Food_price_sell: %d\n", pplayer->price_food_sell);
-    int k;
-    printf("Food amount player: ");
-    scanf("%d", &k);
-    pplayer->delta_food = k;
-    printf("\nFood buy cost: %d\n", pplayer->price_food_buy*k);
-    printf("Food sell profit: %d\n", pplayer->price_food_sell*k);
-  } players_iterate_end;*/
-  /*GtkWidget *dialog, *label, *content_area, *enter_price, *button;
- GtkDialogFlags flags;
+    pplayer->delta_food = amount;
+  printf("Player delta food (buy = +) %d\n", pplayer->delta_food);
+  } players_iterate_end;
+    //printf("Player delta food (buy = +) %d\n", pplayer->delta_food);
+}
 
- // Create the widgets
- flags = GTK_DIALOG_DESTROY_WITH_PARENT;
- dialog = gtk_dialog_new_with_buttons ("Global Market",
-                                       NULL,
-                                       flags,
-                                       _("_OK"),
-                                       GTK_RESPONSE_OK,
-                                       _("_NONE"),
-                                       GTK_RESPONSE_NONE,
-                                       NULL);
- content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
- label = gtk_label_new ("Current price: ");
+static void buy_change(GtkButton *button_trade, gpointer   user_data);
 
- // Ensure that the dialog box is destroyed when the user responds
+static void sell_change(GtkButton *button_trade, gpointer   user_data)
+{
+  GtkEntry* entry = user_data;
+  int amount = atoi((char *)gtk_entry_get_text(GTK_ENTRY(entry)));
+  char buffer[32];
+  snprintf(buffer, sizeof(buffer), "Sell amount: %d", amount);
+  gtk_label_set_text(GTK_LABEL(delta_recourse_sell), buffer);
+  snprintf(buffer, sizeof(buffer), "Buy amount: %d", 0);
+  gtk_label_set_text(GTK_LABEL(delta_recourse_buy), buffer);
+  players_iterate(pplayer) {
+    if (client_has_player() && pplayer != client_player()) {
+      continue;
+    }
+    pplayer->delta_food = -amount;
+    printf("Player delta food (sell = -) %d\n", pplayer->delta_food);
+  } players_iterate_end;
+  //printf("Player delta food (sell = -) %d\n", pplayer->delta_food);
+}
+static void sell_change(GtkButton *button_trade, gpointer   user_data);
 
-  g_signal_connect_swapped (dialog,
-                           "response",
-                           G_CALLBACK (gtk_widget_destroy),
-                           dialog);
-  enter_price = gtk_entry_new();
-  gtk_box_pack_start (gtk_dialog_get_content_area (dialog),
-                    enter_price,
-                    FALSE,
-                    FALSE,
-                    10);
-  button = gtk_button_new_with_label ("change");
-  gtk_box_pack_start (gtk_dialog_get_content_area (dialog),
-                    button,
-                    FALSE,
-                    FALSE,
-                    10);
- // Add the label, and show everything we’ve added
- 
- 
-  //g_signal_connect(enter_price, "price changed", G_CALLBACK(price_changed), NULL);
-  g_signal_connect (GTK_DIALOG (dialog), "response", G_CALLBACK (price_changed), enter_price);
- gtk_container_add (GTK_CONTAINER (content_area), label);
- gtk_widget_show_all (dialog);
- //price_changed(enter_price);
- gtk_dialog_run(dialog);
- //GtkEntry* entry = data;
 
- */
+void globalmarket_report_dialog_popup(){
+  int amount,total_prod, total_use, pl_prod, pl_use, pl_food, pl_surp, price;
+  players_iterate(pplayer) {
+    if (client_has_player() && pplayer != client_player()) {
+      continue;
+    }
+    amount = pplayer->delta_food;
+    price = pplayer->price_food_buy;
+    total_use = count_total_usage();
+    total_prod = count_total_production();
+    pl_use = count_total_usage_player(pplayer);
+    pl_prod = count_total_production_player(pplayer);
+    pl_food = player_food_count(pplayer);
+    pl_surp = count_total_surp_player(pplayer); 
+
+  } players_iterate_end;
+  
+
   GtkWidget *dialog;
   GtkWidget *content_area;
   GtkWidget *label;
-  GtkWidget *button_trade;
-   GtkWidget *enter_price;
+
 
   gint response_id;
 
-  /*Create the dialog window. Modal windows prevent interaction with other 
-  windows in the same application*/
-  dialog = gtk_dialog_new_with_buttons ("A Gtk+ Dialog", 
+  
+  dialog = gtk_dialog_new_with_buttons ("Global market", 
                                         NULL, 
                                         GTK_DIALOG_MODAL, 
                                         GTK_STOCK_OK, 
                                         GTK_RESPONSE_OK, 
                                         NULL);
-   // g_signal_connect(calculate, "clicked", G_CALLBACK(do_calculate), NULL);
-  /*Create a label and attach it to the content area of the dialog*/
+
   content_area = gtk_dialog_get_content_area (GTK_DIALOG (dialog));
   label = gtk_label_new ("This demonstrates a dialog with a label");
   gtk_container_add (GTK_CONTAINER (content_area), label);
 
-  /*The main purpose of this is to show dialog's child widget, label*/
-  
-  enter_price = gtk_entry_new();
-  gtk_box_pack_start (gtk_dialog_get_content_area (dialog),
-                    enter_price,
-                    FALSE,
-                    FALSE,
-                    10);
+  GtkWidget *button_trade1, *button_trade2, *w_price, *w_total_prod, *w_total_use, *w_pl_food, *w_pl_surp;
 
-  button_trade = gtk_button_new_with_label("Confirm");
-  g_signal_connect(button_trade, "clicked", G_CALLBACK(price_changed), enter_price);
-  gtk_box_pack_start (gtk_dialog_get_content_area (dialog),
-                    button_trade,
-                    FALSE,
-                    FALSE,
-                    10);
+  char buffer[32];
+
+  snprintf(buffer, sizeof(buffer), "Preice: %d", price);
+  w_price = gtk_label_new(buffer);
+  gtk_box_pack_start (content_area, w_price, FALSE, FALSE, 10);
+    //memset(buffer, 0, 32);
+
+  snprintf(buffer, sizeof(buffer), "Total production: %d", count_total_production());
+  w_total_prod = gtk_label_new(buffer);
+  gtk_box_pack_start (content_area, w_total_prod, FALSE, FALSE, 10);
   
-  /*Connecting the "response" signal from the user to the associated
-  callback function*/
+  
+  snprintf(buffer, sizeof(buffer), "Total usage: %d", total_use);
+  w_total_use = gtk_label_new(buffer);
+  gtk_box_pack_start (content_area, w_total_use, FALSE, FALSE, 10);
+
+  snprintf(buffer, sizeof(buffer), "Your total food: %d", pl_food);
+  w_pl_food = gtk_label_new(buffer);
+  gtk_box_pack_start (content_area, w_pl_food, FALSE, FALSE, 10);
+
+  snprintf(buffer, sizeof(buffer), "Your total surplus: %d", pl_surp);
+  w_pl_surp = gtk_label_new(buffer);
+  gtk_box_pack_start (content_area, w_pl_surp, FALSE, FALSE, 10);
+
+//------------------------------------------INPUT---------------------------------------------------------
+  snprintf(buffer, sizeof(buffer), "Sell amount: %d", amount);
+  delta_recourse_sell = gtk_label_new(buffer);
+  gtk_box_pack_start (content_area, delta_recourse_sell, FALSE, FALSE, 10);
+
+  enter_sell = gtk_entry_new();
+  gtk_box_pack_start (content_area, enter_sell, FALSE, FALSE, 10);
+
+  button_trade1 = gtk_button_new_with_label("Confirm sell amount");
+  g_signal_connect(button_trade1, "clicked", G_CALLBACK(sell_change), enter_sell);
+  gtk_box_pack_start (content_area, button_trade1, FALSE, FALSE, 10);
+
+  snprintf(buffer, sizeof(buffer), "Buy amount: %d", amount);
+  delta_recourse_buy = gtk_label_new(buffer);
+  gtk_box_pack_start (content_area, delta_recourse_buy, FALSE, FALSE, 10);
+
+  enter_buy = gtk_entry_new();
+  gtk_box_pack_start (content_area, enter_buy, FALSE, FALSE, 10);
+
+  button_trade2 = gtk_button_new_with_label("Confirm buy amount");
+  g_signal_connect(button_trade2, "clicked", G_CALLBACK(buy_change), enter_buy);
+  gtk_box_pack_start (content_area, button_trade2, FALSE, FALSE, 10);
 
   gtk_widget_show_all (dialog);
 
   g_signal_connect (GTK_DIALOG (dialog), 
                     "response", 
                     G_CALLBACK (on_response), 
-                    enter_price);
+                    enter_sell);
 }
 
 
