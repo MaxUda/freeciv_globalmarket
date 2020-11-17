@@ -20,6 +20,7 @@
 #include"city.h"
 #include"trade.h"
 
+int count_max_price();
 int count_total_usage();
 int count_total_production();
 int count_total_surp_player(struct player* pplayer);
@@ -32,25 +33,19 @@ int calculate_price(int stock, int prev_price, float delta_k);
 
 
 void test1(){
-	printf("New turn ------------------------------------------\n");
 	players_iterate(pplayer) {
-    	printf("Player name %s\n", pplayer->name);
+    	
 		city_list_iterate(pplayer->cities, pcity) {
 		  char* city_name = pcity->name;
 		  int food = pcity->prod[O_FOOD];
 		  int food_surplus = pcity->surplus[O_FOOD];
-		  printf("  City name: %s\n    Food: %d\n    Food surplus: %d\n", city_name, food, food_surplus);
-		} city_list_iterate_end;
-    
-    	
+		} city_list_iterate_end;	
     } players_iterate_end;
 }
 
 void test_output(){
-	printf("New turn ------------------------------------------\n");
 	players_iterate(pplayer) {
 
-    	printf("Player name %s\n", pplayer->name);
 		city_list_iterate(pplayer->cities, pcity) {
 		  char* city_name = pcity->name;
 		  int food_prod = pcity->prod[O_FOOD];
@@ -61,8 +56,7 @@ void test_output(){
 		  int shield_stock = pcity->shield_stock;
 		  int shield_surplus = pcity->surplus[O_SHIELD];
 
-		  printf("  City name: %s\n    Food prod: %d\n    Food stock: %d\n    Food surplus: %d\n", city_name, food_prod, food_stock, food_surplus);
-		  printf("    Shield prod: %d\n    Shield stock: %d\n    Shield surplus: %d\n", shield_prod, shield_stock, shield_surplus);
+		  
 		} city_list_iterate_end;
 
     } players_iterate_end;
@@ -143,7 +137,6 @@ void take_food_mode_1(struct player *pplayer ,int food_amount){
 		if(max_food_stock_city->food_stock > 0)
 			max_food_stock_city->food_stock--;
 		else{
-			printf("food stock empty!\n");
 			continue;
 		}
 	}
@@ -152,13 +145,15 @@ void take_food_mode_1(struct player *pplayer ,int food_amount){
 
 
 void distribute_resource(const struct player *pplayer, int resource_type, int resource_amount, int distribute_mode){
-	//printf("%d\n", count_player_cities(pplayer));
+
 	if(count_player_cities(pplayer) > 0)
 		switch(resource_type){
 			case 1://food
 				switch(distribute_mode){
 					case 1:
+						
 						distribute_food_mode_1(pplayer, resource_amount);
+						
 						break;
 					default:
 						printf("No such take_mode");
@@ -179,8 +174,6 @@ void distribute_food_mode_1(struct player *pplayer, int food_amount){
 		struct city *min_food_stock_city;
 		int min_food_stock = 111110;
 		city_list_iterate(pplayer->cities, pcity) {
-			int granagy_size = city_granary_size(city_size_get(min_food_stock_city));
-
 			if(pcity->food_stock < min_food_stock){
 				min_food_stock = pcity->food_stock;
 	  			min_food_stock_city = pcity;
@@ -190,7 +183,6 @@ void distribute_food_mode_1(struct player *pplayer, int food_amount){
 		if (granagy_size > min_food_stock_city->food_stock)
 			min_food_stock_city->food_stock++;
 		else{
-			printf("food stock full!\n");
 			continue;
 		}
 	}
@@ -211,22 +203,25 @@ void commit_bargains(int resource_type)
 			case 1://food
 				if(pplayer->delta_food == 0)
 					continue;
-				//printf("%d\n", pplayer->delta_food);
 				int delta_food = pplayer->delta_food;
-				int sell_price = pplayer->price_food_sell;
+				int sell_price = pplayer->price_food_buy;
 				int buy_price = pplayer->price_food_buy;
 				if(pplayer->delta_food > 0){
-					if(pplayer->economic.gold > delta_food*sell_price*2)
+						if (!is_ai(pplayer) && !is_barbarian(pplayer))
+						printf("Gold: %d\n", pplayer->economic.gold);
+					if(pplayer->economic.gold > delta_food*sell_price*2){
 						pplayer->economic.gold -= (delta_food*sell_price);
-					else
-						printf("NO gold!\n");
-					distribute_resource(pplayer, 1, delta_food, 1);
+						if (!is_ai(pplayer) && !is_barbarian(pplayer))
+						printf("Gold: %d\n", pplayer->economic.gold);
+						distribute_resource(pplayer, 1, delta_food, 1);
+					}
 				}else if(pplayer->delta_food < 0){
-					pplayer->economic.gold += -(delta_food*buy_price);
-					take_resource(pplayer, 1, -delta_food, 1);
+					if(player_food_count(pplayer) >= abs(pplayer->delta_food)){
+						pplayer->economic.gold += -(delta_food*buy_price);
+						take_resource(pplayer, 1, -delta_food, 1);
+					}
 				}
 				pplayer->delta_food = 0;
-				printf("commit_bargans\n");
 				break;
 			default:
 				break;
@@ -260,21 +255,11 @@ int calculate_sell_price(struct player *pplayer, int recourse_type){
 
 int calculate_price(int stock, int prev_price, float delta_k)
 {
-	//int price =  ceil(abs((stock + count_total_production())/count_total_usage()));
-	//int price =  ceil(abs((stock + count_total_production())/count_total_usage()));
-	/*float c_t_p = count_total_production();
-	float c_t_u = count_total_usage();
-	float stock1 = stock;
-	double delta_price = count_total_usage()/(count_total_production() - 15 + stock1);
-	double PP = prev_price;
-	int price = 7*delta_price;
-	printf("Price: %f\n", delta_price);*/
-	//printf("Total prod %d\nTotal use %d\nPreice %d\n", count_total_production(), count_total_usage(), price);
 
 
 	float p_price = prev_price;
 	
-	int price = ceil(p_price*(1 + 100*delta_k));
+	int price = floor(p_price*(1 + 100*delta_k));
 	printf("P_Price %f\n", delta_k);
 	return price;
 }
@@ -283,13 +268,12 @@ void update_price(struct player *pplayer, float s, int stock)
 {
 	//static float k_prev = 0;
 	//float k = (float)count_total_usage()/(float)count_total_production();
-	//printf("Stock: %d\n", stock);
-	printf("Stock: %d\n", stock);
-	//printf("k_prev: %f k: %f\n", k_prev, k);
 	
 	int price = calculate_price(stock, pplayer->price_food_buy, s);
 	if(price < 1)
 		price = 1;
+	//if(price > count_max_price())
+	//	price = count_max_price();
 	pplayer->price_food_buy = price;
 	pplayer->price_food_sell = price;
 	//stock++;
@@ -313,6 +297,21 @@ void make_ai_trade(int stock)
     } players_iterate_end;
 }
 
+int count_max_price()
+{
+	int total_gold = 0;
+	int total_food = 0;
+	players_iterate(pplayer){
+		total_gold += pplayer->economic.gold;
+		city_list_iterate(pplayer->cities, pcity){
+			total_food += pcity->food_stock;
+		}city_list_iterate_end;
+	}players_iterate_end;
+	int average = total_gold/player_count();
+	int max_price = average/total_food*5 + 10;
+	return max_price/2;
+}
+
 void ai_player_trade_1(struct player *pplayer, int stock)
 {	
 	float pl_use = (float)count_total_usage_player(pplayer);
@@ -321,32 +320,34 @@ void ai_player_trade_1(struct player *pplayer, int stock)
 	float t_prod = count_total_production();
 	float k = t_use/t_prod;
 	float pl_k = pl_use/pl_prod;
-	printf("%f - %f - %f - %f - %f\n", pl_use, pl_prod, pl_k, ceil(pl_prod*(pl_k - k)), k);
 	if(pl_k > k){
 		//if(fabs(t_use*pl_prod - pl_use*t_prod) > fabs(t_prod - pl_prod)){
-		//printf("a %f b %f\n", fabs(t_use - pl_use), fabs(t_prod - pl_prod));
-		//	pplayer->delta_food = ceil(pl_prod*(pl_k - k));
-		//	printf("+\n");
+		if(pplayer->price_food_buy <= count_max_price())
+			pplayer->delta_food = ceil(pl_prod*(pl_k - k));
+		
 		//}
-
+		
 		//pplayer->delta_food = ceil(pl_prod*(pl_k - k));
 		//if(pplayer->delta_food*pplayer->price_food_buy > pplayer->economic.gold)
 			//pplayer->delta_food = 0;
-		//printf("%f\n", ceil(abs(1-pl_k)*pl_prod)*3);
+		
 	}else if (pl_k < k){
 		//if(fabs(t_use - pl_use) < fabs(t_prod - pl_prod)){
-		//	pplayer->delta_food = ceil(pl_prod*(pl_k - k));
-		//	printf("-\n");
+			//pplayer->delta_food = ceil(pl_prod*(pl_k - k));
+		
 		//}
-		//pplayer->delta_food = -ceil(pl_use*(k - pl_k));
+		
+		pplayer->delta_food = -ceil(pl_use*(k - pl_k));
 		//if(pplayer->delta_food > player_food_count(pplayer))
 		//	pplayer->delta_food = 0;
-		//printf("%d\n", pplayer->delta_food);
+		
 	}
+	
+	//pplayer->delta_food = floor(t_prod/player_count() - pl_prod/fabs(stock));
 
 	/*if(fabs(t_use - pl_use) < fabs(t_prod - pl_prod) && pl_prod > 0){
 			pplayer->delta_food = ceil((pl_prod-stock)*(pl_k - k));
-			printf("pl_k - k: %f\n");
+			
 	}*/
 }
 
@@ -399,12 +400,12 @@ int count_player_resource_chars(struct player *pplayer, int resource_type)
 void make_player_eco_report(struct player* pplayer, struct player_resource_chars *pl_rc_ch, int resource_type)
 {
 
-	    printf("/\n");
+	    
 	pl_rc_ch->surplus_cities_count = 0;
 	pl_rc_ch->total_resource_delta = 0;
 	pl_rc_ch->shoretage_cities_count = 0;
 	pl_rc_ch->neutral_city_count = 0;
-		printf("/\n");
+		
 	city_list_iterate(pplayer->cities, pcity){
 		if(pcity->surplus[O_FOOD] > 0){
 			pl_rc_ch->surplus_cities_count++;

@@ -1467,36 +1467,6 @@ static void end_phase(void)
   } phase_players_iterate_end;
 }
 
-/*static void double_iterate(const struct player *pplayer1){
-    players_iterate(pplayer){
-      if(pplayer != pplayer1){
-        if(players_can_trade(pplayer1, pplayer)){
-          char *pp_name = player_name(pplayer);
-          printf("%s\n", pp_name);
-        }
-      }
-    }players_iterate_end;
-}
-
-static void can_traid_with(void){
-    players_iterate(pplayer) {
-      char *pp_name =  player_name(pplayer);
-      printf("%s can traid with: \n", pp_name);
-      double_iterate(pplayer);
-    
-    city_list_iterate(pplayer->cities, pcity) {
-      shields += pcity->prod[O_SHIELD];
-      food += pcity->prod[O_FOOD];
-    } city_list_iterate_end;
-    
-    	//printf("food: %d\nshields: %d\n=============", food, shields);
-    	food = 0;
-    	shields = 0;
-
-    	
-    } players_iterate_end;
-}*/
-
 static void test_distr(){
   players_iterate(pplayer) {
     if (is_ai(pplayer) || is_barbarian(pplayer)) {
@@ -1530,49 +1500,31 @@ void test_change_food(){
   } players_iterate_end;
 }
 
-
-void test_chars(){
-  players_iterate(pplayer) {
-    struct player_resource_chars *pl_rs_ch;
-    struct player_resource_chars pl;
-    pl_rs_ch = &pl;
-    printf("/\n");
-    make_player_eco_report(pplayer, pl_rs_ch, 1);
-    printf("/\n");
-    print_player_resource_chars(pl_rs_ch);
-    printf("/\n");
-  } players_iterate_end;
-}
-
-
-
 void test_price_making(){
  
   fp = fopen("output.txt", "a+");
   int i = 0;
   static float k_prev = 0;
-  static int stock = 110;
-  float k = (float)count_total_usage()/((float)count_total_production() + stock);
+  static int stock = 10;
+  float k = ((float)count_total_usage()/(float)count_total_production());
   //float k = (float)count_total_production()/(float)count_total_usage();
 
   float s = k_prev - k;
-  //printf("DELTA %f\n", s);
+  
   players_iterate(pplayer) {
-    printf("pl_delta: %d\n", pplayer->delta_food);
+    
     update_price(pplayer, s, stock);
     stock += pplayer->delta_food;
    //stock+= 10;
-    printf("||||||||||||||||||||||||||||||%d\n", pplayer->delta_food);
+    
     //if (pplayer->name == "Cesar") {
     if (i == 0){
-      printf("Total prod: %d\nTotal use: %d\nPreice: %d\n", count_total_production(), count_total_usage(), pplayer->price_food_buy);
       fprintf(fp, "%d %d %d %d\n", count_total_production(), count_total_usage(), pplayer->price_food_buy, stock);
       i++;
     }
        //}
   } players_iterate_end;
   fclose(fp);
-  printf("==========================\n");
   commit_bargains(1);
   make_ai_trade(stock);
   k_prev = k;

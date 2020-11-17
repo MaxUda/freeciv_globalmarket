@@ -24,6 +24,7 @@ void commit_bargains(int resource_type);
 void make_ai_trade(int stock);
 int count_total_production();
 int count_total_usage();
+int count_max_price();
 
 
 #endif 
